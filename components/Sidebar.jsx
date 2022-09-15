@@ -3,12 +3,68 @@ import { Avatar, Button, IconButton } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/MoreVert";
+import * as EmailValidator from "email-validator";
+import { auth, db } from "../firebase";
+import {
+  doc,
+  setDoc,
+  getDocs,
+  collection,
+  where,
+  addDoc,
+  query
+} from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollection } from "react-firebase-hooks/firestore";
+import Chat from "./Chat";
 
 const Sidebar = () => {
+  const [user] = useAuthState(auth);
+  const userChatRef = query(
+    collection(db, "chats"),
+    where("users", "array-contains", user.email)
+  );
+  const [chatsSnapshot] = useCollection(userChatRef);
+
+  const createChat = () => {
+    const emailInput = prompt("Please enter an email address of other user");
+
+    if (!emailInput) return null;
+
+    if (
+      EmailValidator.validate(emailInput) &&
+      !chatAlreadyExist(emailInput) &&
+      emailInput !== user.email
+    ) {
+      addDoc(collection(db, "chats"), {
+        users: [user.email, emailInput]
+      });
+    }
+  };
+
+  const chatAlreadyExist = (recipientEmail) =>
+    !!chatsSnapshot?.docs.find(
+      (chat) =>
+        chat.data().users.find((user) => user === recipientEmail)?.length > 0
+    );
+
+  // function googleSignout() {
+  //   auth()
+  //     .signOut()
+  //     .then(
+  //       function () {
+  //         console.log("Signout Succesfull");
+  //       },
+  //       function (error) {
+  //         console.log("Signout Failed");
+  //       }
+  //     );
+  // }
+
   return (
     <Container>
       <Header>
-        <UserAvatar />
+        <UserAvatar onClick={() => auth.signOut()} />
 
         <IconContainer>
           <IconButton>
@@ -19,22 +75,42 @@ const Sidebar = () => {
           </IconButton>
         </IconContainer>
       </Header>
-
       <Search>
         <SearchIcon />
         <SearchInput placeholder="Search In Chats" />
       </Search>
-
-      <SidebarButton> Start a new chat </SidebarButton>
+      <SidebarButton onClick={createChat}> Start a new chat </SidebarButton>
 
       {/* Chat List */}
+      {chatsSnapshot?.docs.map((chat) => (
+        <Chat key={chat.id} id={chat.id} users={chat.data().users} />
+      ))}
     </Container>
   );
 };
 
 export default Sidebar;
 
-const Container = styled.div``;
+const Container = styled.div`
+  flex: 0.45;
+  border-right: 1px solid whitesmoke;
+  height: 100vh;
+  min-width: 300px;
+  max-width: 350px;
+  overflow-y: scroll;
+  background-color: #ffffff;
+
+  * {
+    color: #000000;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+`;
 
 const Search = styled.div`
   display: flex;

@@ -10,7 +10,6 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Sidebar />
-      <h1>WhatsApp Clone with NextJS</h1>
     </div>
   );
 }
