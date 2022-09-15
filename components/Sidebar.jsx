@@ -94,6 +94,11 @@ const Container = styled.div`
 
   -ms-overflow-style: none;
   scrollbar-width: none;
+
+  @media screen and (max-width: 600px){
+    min-width: 30px;
+    max-width: 100px;
+  }
 `;
 
 const Search = styled.div`

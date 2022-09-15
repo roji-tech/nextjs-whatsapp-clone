@@ -30,7 +30,7 @@ const Chat = ({ id, users }) => {
       ) : (
         <UserAvatar>{recipientEmail[0]}</UserAvatar>
       )}
-      <p>{recipientEmail}</p>
+      <p className="recEmail">{recipientEmail}</p>
     </Container>
   );
 };
@@ -46,6 +46,15 @@ const Container = styled.div`
 
   :hover {
     background-color: #e9ebe9;
+  }
+
+
+  @media screen and (max-width: 600px){
+    justify-content: center;
+    
+    .recEmail {
+      display: none;
+    }
   }
 `;
 
