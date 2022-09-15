@@ -6,17 +6,18 @@ import styled from "styled-components";
 import { auth, db } from "../firebase";
 import getRecipientEmail from "../utils/getRecipientEmail";
 import { useRouter } from "next/router";
+
 const Chat = ({ id, users }) => {
   const router = useRouter();
   const [user] = useAuthState(auth);
   const recipientEmail = getRecipientEmail(users, user);
 
-  const recipientSnapshot = query(
+  const [recipientSnapshot] = useCollection(query(
     collection(db, "users"),
     where("email", "==", recipientEmail)
-  );
+  ));
 
-  const recipient = recipientSnapshot?.docs?.[0].data();
+  const recipient = recipientSnapshot?.docs?.[0]?.data();
 
   const enterChat = () => {
     router.push(`/chat/${id}`);

@@ -5,7 +5,6 @@ import { auth } from "../firebase";
 const Message = ({ user, message }) => {
   const [userLoggedIn] = useAuthState(auth);
 
-  console.warn(message, "_________________________");
   const TypeOfMessage = user === userLoggedIn.email ? Sender : Receiver;
 
   return (

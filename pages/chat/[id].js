@@ -20,7 +20,6 @@ import { getRecipientStripedEmail } from "../../utils/getRecipientEmail";
 
 const SingleChat = ({ chat, messages }) => {
   chat = JSON.parse(chat);
-  const router = useRouter();
   const [user] = useAuthState(auth);
   const recipientEmail = getRecipientStripedEmail(chat?.users, user);
 
@@ -49,7 +48,7 @@ export const getServerSideProps = async (context) => {
   // import { query, orderBy } from "firebase/firestore";
 
   // const q = query(citiesRef, orderBy("state"), orderBy("population", "desc"));
-  const msgRef = await getDocs(collection(chatRef, "messages"));
+  const msgRef = await getDocs(collection(chatRef, "messages"),  orderBy("timestamp", "asc"));
 
 
   const messages = msgRef.docs
@@ -67,10 +66,7 @@ export const getServerSideProps = async (context) => {
 
   if (chatRes.exists()) {
     chat = { id: chatRes?.id, users: chatRes?.data().users, ...chatRes };
-    console.log("chat");
-    console.log(chat.users);
   } else {
-    // doc.data() will be undefined in this case
     console.log("No such document!");
   }
 

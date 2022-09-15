@@ -6,9 +6,6 @@ import SearchIcon from "@mui/icons-material/MoreVert";
 import * as EmailValidator from "email-validator";
 import { auth, db } from "../firebase";
 import {
-  doc,
-  setDoc,
-  getDocs,
   collection,
   where,
   addDoc,
@@ -48,24 +45,11 @@ const Sidebar = () => {
         chat.data().users.find((user) => user === recipientEmail)?.length > 0
     );
 
-  // function googleSignout() {
-  //   auth()
-  //     .signOut()
-  //     .then(
-  //       function () {
-  //         console.log("Signout Succesfull");
-  //       },
-  //       function (error) {
-  //         console.log("Signout Failed");
-  //       }
-  //     );
-  // }
 
   return (
     <Container>
       <Header>
-        <UserAvatar onClick={() => auth.signOut()} />
-
+        <UserAvatar src={user?.photoURL} onClick={() => auth.signOut()} />
         <IconContainer>
           <IconButton>
             <ChatIcon />

@@ -10,14 +10,15 @@ import {
   serverTimestamp,
   where,
   query,
-  setDoc
+  setDoc,
+  orderBy
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollection } from "react-firebase-hooks/firestore";
 import styled from "styled-components";
 import { auth, db } from "../firebase";
-import { getRecipientStripedEmail } from "../utils/getRecipientEmail";
+import getRecipientEmail, { getRecipientStripedEmail } from "../utils/getRecipientEmail";
 import Message from "./Message";
 
 const ChatScreen = ({ chat, messages }) => {
@@ -25,19 +26,23 @@ const ChatScreen = ({ chat, messages }) => {
   const lastMessageRef = useRef();
   const [user] = useAuthState(auth);
   const router = useRouter();
-  const recipientEmail = getRecipientStripedEmail(chat?.users, user);
+  const recipientStripedEmail = getRecipientStripedEmail(chat?.users, user);
+  const recipientEmail = getRecipientEmail(chat?.users, user);
   const [messagesSnapShot] = useCollection(
-    collection(doc(db, "chats", router.query.id), "messages")
+    query(
+      collection(doc(db, "chats", router.query.id), "messages"),
+      orderBy("timestamp", "asc")
+    )
   );
-  const recipientSnapshot = useCollection(
-    query(collection(db, "users"), where("email", "==", recipientEmail))
-  );
-  const recipient = recipientSnapshot?.docs;
 
-  console.log(recipientSnapshot);
-  console.log("====================recipientSnapshot");
-  console.log(recipient);
-  console.error("(((((((((((((((((((((((((((((((((((((((((((((((((((((");
+  const recipientSnapshot = useCollection(
+    query(
+      collection(db, "users"),
+      where("email", "==", recipientEmail)
+    )
+  );
+
+  const recipient = recipientSnapshot?.docs?.[0]?.data();
 
   const scrollToBottom = () => {
     lastMessageRef.current.scrollIntoView({
@@ -48,16 +53,12 @@ const ChatScreen = ({ chat, messages }) => {
 
   const showMessages = () => {
     if (messagesSnapShot) {
-      messagesSnapShot.docs.map((message) =>
-        console.log(message.data().message)
-      );
-      // console.log(messagesSnapShot.docs);
       return messagesSnapShot.docs.map((message) => (
         <Message
           key={message?.id}
           user={message?.data()?.user}
           message={{
-            ...message?.data().message,
+            message: message?.data().message,
             timestamp: message?.data().timestamp?.toDate().getTime()
           }}
         />
@@ -100,7 +101,7 @@ const ChatScreen = ({ chat, messages }) => {
           <Avatar>{recipientEmail[0]}</Avatar>
         )}
         <HeaderInfo>
-          <h3>{recipientEmail}</h3>
+          <h3>{recipientStripedEmail}</h3>
           {recipientSnapshot ? (
             <p>
               Last Seen{" "}
@@ -111,7 +112,6 @@ const ChatScreen = ({ chat, messages }) => {
           ) : (
             <p>Loading Last Active...</p>
           )}
-          <p>Last Seen...</p>
         </HeaderInfo>
         <HeaderIcons>
           <IconButton>
@@ -159,7 +159,7 @@ const HeaderInfo = styled.div`
   flex: 1;
 
   > h3 {
-    margin-bottom: 3px;
+    margin-bottom: 5px;
   }
 
   > p {
@@ -177,7 +177,7 @@ const MessageContainer = styled.div`
 `;
 
 const EndOfMessage = styled.div`
-  margin-bottom: 50px;
+  margin-bottom: 25px;
 `;
 
 const Input = styled.input`
