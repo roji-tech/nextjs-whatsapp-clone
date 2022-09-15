@@ -127,12 +127,14 @@ const ChatScreen = ({ chat, messages }) => {
         <EndOfMessage ref={lastMessageRef} />
       </MessageContainer>
       <InputContainer>
-        <InsertEmoticon />
-        <Input value={input} onChange={(e) => setInput(e.target.value)} />
-        <Mic />
-        <button hidden disabled={!input} type="submit" onClick={sendMessage}>
-          Send Message
-        </button>
+        <div>
+          <InsertEmoticon />
+          <Input placeholder="type your message" value={input} onChange={(e) => setInput(e.target.value)} />
+          <Mic />
+          <button hidden disabled={!input} type="submit" onClick={sendMessage}>
+            Send Message
+          </button>
+        </div>
       </InputContainer>
     </Container>
   );
@@ -193,14 +195,20 @@ const Input = styled.input`
   border: 0;
   border-radius: 20px;
   margin: 0 15px;
-`;
-
+  `;
+  
 const InputContainer = styled.form`
-  display: flex;
-  align-items: center;
-  padding: 10px;
+  padding: 5px;
   position: sticky;
   bottom: 0;
   background-color: white;
   z-index: 100;
+
+  >div {
+    display: flex;
+    background-color: whitesmoke;
+    padding: 6px;
+    align-items: center;
+    border-radius: 20px;
+    }
 `;

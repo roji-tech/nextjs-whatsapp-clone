@@ -10,8 +10,10 @@ const Message = ({ user, message }) => {
   console.log(moment(message.timestamp).format("LT"), "LLLLLLLLLLLLLLLLLLLLLL")
   return (
     <Container>
-      <TypeOfMessage>{message?.message}</TypeOfMessage>
-      <TimeStamp>{message.timestamp ? moment(message.timestamp).format("LT") : "..."}</TimeStamp>
+      <TypeOfMessage>
+        {message?.message}
+        <TimeStamp>{message.timestamp ? moment(message.timestamp).format("LT") : "..."}</TimeStamp>
+      </TypeOfMessage>
     </Container>
   );
 };
